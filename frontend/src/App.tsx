@@ -1,24 +1,22 @@
-import { useState , useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
 import './App.css'
+import { fetchUsers } from './api'
+import type { User } from './types'
 
 function App() {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
-    fetch('https://randomuser.me/api?results=20')
-      .then(response => response.json())
-      .then(data => setUsers(data.results))
-      .catch(error => console.error('Error fetching users:', error));
-  }, []);
+    fetchUsers(page).then(setUsers).catch(console.error);
+  }, [page]);
 
   return (
-     <div>
+    <div>
       <h1>Random Users</h1>
       <div>
         <ul className="users-list">
-          {users.map((user , idx) => (
+          {users.map((user, idx) => (
             <li key={user.login.uuid}>
               <div className="avatar">
                 <img src={user.picture.thumbnail} alt={`${user.name.first} ${user.name.last}`} />
@@ -28,6 +26,15 @@ function App() {
             </li>
           ))}
         </ul>
+      </div>
+      <div className="pagination">
+        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>
+          Previous
+        </button>
+        <span>Page {page}</span>
+        <button onClick={() => setPage(p => p + 1)}>
+          Next
+        </button>
       </div>
     </div>
   )
