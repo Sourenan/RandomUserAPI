@@ -2,10 +2,14 @@ import { useState, useEffect, useMemo } from 'react'
 import './App.css'
 import { fetchUsers } from './api'
 import type { User, Location } from './types'
+import UsersTable from './components/UsersTable'
+
+type Tab = 'cards' | 'table';
 
 function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [page, setPage] = useState(1);
+  const [activeTab, setActiveTab] = useState<Tab>('cards');
 
   const userLocations = useMemo<Location[]>(() => users.map(u => u.location), [users]);
 
@@ -16,7 +20,23 @@ function App() {
   return (
     <div>
       <h1>Random Users</h1>
-      <div>
+
+      <div className="tabs">
+        <button
+          className={`tab-btn${activeTab === 'cards' ? ' active' : ''}`}
+          onClick={() => setActiveTab('cards')}
+        >
+          Cards
+        </button>
+        <button
+          className={`tab-btn${activeTab === 'table' ? ' active' : ''}`}
+          onClick={() => setActiveTab('table')}
+        >
+          Table
+        </button>
+      </div>
+
+      {activeTab === 'cards' && (
         <ul className="users-list">
           {users.map((user, idx) => (
             <li key={user.login.uuid}>
@@ -28,7 +48,10 @@ function App() {
             </li>
           ))}
         </ul>
-      </div>
+      )}
+
+      {activeTab === 'table' && <UsersTable users={users} />}
+
       <div className="pagination">
         <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>
           Previous
