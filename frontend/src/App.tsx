@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import './App.css'
 import { fetchUsers } from './api'
-import type { User } from './types'
+import type { User, Location } from './types'
 
 function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [page, setPage] = useState(1);
+
+  const userLocations = useMemo<Location[]>(() => users.map(u => u.location), [users]);
 
   useEffect(() => {
     fetchUsers(page).then(setUsers).catch(console.error);
@@ -22,7 +24,7 @@ function App() {
                 <img src={user.picture.thumbnail} alt={`${user.name.first} ${user.name.last}`} />
                 <img className="avatar-large" src={user.picture.large} alt={`${user.name.first} ${user.name.last}`} />
               </div>
-              {idx + 1}. {user.name.first} {user.name.last}
+              {idx + 1}. {user.name.first} {user.name.last} — {userLocations[idx]?.country}
             </li>
           ))}
         </ul>
